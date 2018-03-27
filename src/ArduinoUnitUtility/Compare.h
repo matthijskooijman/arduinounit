@@ -1,11 +1,14 @@
 #pragma once
-#include <ArduinoUnitUtility/Flash.h>
-#include <ArduinoUnitUtility/ArduinoUnitWiden.h>
-#include <WString.h>
+#include <stdint.h>
+#include "Flash.h"
+#include "ArduinoUnitWiden.h"
+#if defined(ARDUINO)
+#  include <WString.h>
+#endif
 
 template  < typename A, typename B > struct Compare
 {
-  inline static int between(const A &a,const B &b)
+  inline static int8_t between(const A &a,const B &b)
   {
     if (a<b) return -1;
     if (b<a) return  1;
@@ -36,14 +39,26 @@ template  < typename A, typename B > struct Compare
     return !(a<b);
   } // moreOrEqual
 };
+#if defined(ARDUINO)
 template  <  > struct Compare<String,String>;
+#endif
+#if defined(ARDUINO)
 template  <  > struct Compare<String,const char *>;
+#endif
 #if ARDUINO_UNIT_USE_FLASH  > 0
+#if defined(ARDUINO)
 template  <  > struct Compare<String,const __FlashStringHelper *>;
 #endif
+#endif
+#if defined(ARDUINO)
 template  <  > struct Compare<String,char *>;
+#endif
+#if defined(ARDUINO)
 template  < size_t M > struct Compare<String,char [M]>;
+#endif
+#if defined(ARDUINO)
 template  <  > struct Compare<const char *,String>;
+#endif
 template  <  > struct Compare<const char *,const char *>;
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  <  > struct Compare<const char *,const __FlashStringHelper *>;
@@ -51,7 +66,9 @@ template  <  > struct Compare<const char *,const __FlashStringHelper *>;
 template  <  > struct Compare<const char *,char *>;
 template  < size_t M > struct Compare<const char *,char [M]>;
 #if ARDUINO_UNIT_USE_FLASH  > 0
+#if defined(ARDUINO)
 template  <  > struct Compare<const __FlashStringHelper *,String>;
+#endif
 #endif
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  <  > struct Compare<const __FlashStringHelper *,const char *>;
@@ -65,25 +82,31 @@ template  <  > struct Compare<const __FlashStringHelper *,char *>;
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  < size_t M > struct Compare<const __FlashStringHelper *,char [M]>;
 #endif
+#if defined(ARDUINO)
 template  <  > struct Compare<char *,String>;
+#endif
 template  <  > struct Compare<char *,const char *>;
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  <  > struct Compare<char *,const __FlashStringHelper *>;
 #endif
 template  <  > struct Compare<char *,char *>;
 template  < size_t M > struct Compare<char *,char [M]>;
+#if defined(ARDUINO)
 template  < size_t N > struct Compare<char [N],String>;
+#endif
 template  < size_t N > struct Compare<char [N],const char *>;
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  < size_t N > struct Compare<char [N],const __FlashStringHelper *>;
 #endif
 template  < size_t N > struct Compare<char [N],char *>;
 template  < size_t N, size_t M > struct Compare<char [N],char [M]>;
+#if defined(ARDUINO)
 template  <  > struct Compare<String,String>
 {
-  inline static int between(const String &a,const String &b)
+  inline static int8_t between(const String &a,const String &b)
   {
-    return a.compareTo(b);
+    int ans = a.compareTo(b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const String &a,const String &b)
   {
@@ -110,11 +133,14 @@ template  <  > struct Compare<String,String>
     return between(a,b) >= 0;
   } // moreOrEqual
 };
+#endif
+#if defined(ARDUINO)
 template  <  > struct Compare<String,const char *>
 {
-  inline static int between(const String &a,const char * const &b)
+  inline static int8_t between(const String &a,const char * const &b)
   {
-    return a.compareTo(b);
+    int ans = a.compareTo(b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const String &a,const char * const &b)
   {
@@ -141,12 +167,14 @@ template  <  > struct Compare<String,const char *>
     return between(a,b) >= 0;
   } // moreOrEqual
 };
+#endif
 #if ARDUINO_UNIT_USE_FLASH  > 0
+#if defined(ARDUINO)
 template  <  > struct Compare<String,const __FlashStringHelper *>
 {
-  inline static int between(const String &a,const __FlashStringHelper * const &b)
+  inline static int8_t between(const String &a,const __FlashStringHelper * const &b)
   {
-    return ArduinoUnitString(a.c_str()).compare(ArduinoUnitString(b));
+    return ArduinoUnitString(a).compare(ArduinoUnitString(b));
   } // between
   inline static bool equal(const String &a,const __FlashStringHelper * const &b)
   {
@@ -174,11 +202,14 @@ template  <  > struct Compare<String,const __FlashStringHelper *>
   } // moreOrEqual
 };
 #endif
+#endif
+#if defined(ARDUINO)
 template  <  > struct Compare<String,char *>
 {
-  inline static int between(const String &a,char * const &b)
+  inline static int8_t between(const String &a,char * const &b)
   {
-    return a.compareTo(b);
+    int ans = a.compareTo(b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const String &a,char * const &b)
   {
@@ -205,11 +236,14 @@ template  <  > struct Compare<String,char *>
     return between(a,b) >= 0;
   } // moreOrEqual
 };
+#endif
+#if defined(ARDUINO)
 template  < size_t M > struct Compare<String,char [M]>
 {
-  inline static int between(const String &a,const char (&b)[M])
+  inline static int8_t between(const String &a,const char (&b)[M])
   {
-    return a.compareTo(b);
+    int ans = a.compareTo(b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const String &a,const char (&b)[M])
   {
@@ -236,11 +270,14 @@ template  < size_t M > struct Compare<String,char [M]>
     return between(a,b) >= 0;
   } // moreOrEqual
 };
+#endif
+#if defined(ARDUINO)
 template  <  > struct Compare<const char *,String>
 {
-  inline static int between(const char * const &a,const String &b)
+  inline static int8_t between(const char * const &a,const String &b)
   {
-    return -b.compareTo(a);
+    int ans = -b.compareTo(a);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const char * const &a,const String &b)
   {
@@ -267,11 +304,13 @@ template  <  > struct Compare<const char *,String>
     return between(a,b) >= 0;
   } // moreOrEqual
 };
+#endif
 template  <  > struct Compare<const char *,const char *>
 {
-  inline static int between(const char * const &a,const char * const &b)
+  inline static int8_t between(const char * const &a,const char * const &b)
   {
-    return strcmp(a,b);
+    int ans = strcmp(a,b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const char * const &a,const char * const &b)
   {
@@ -301,9 +340,10 @@ template  <  > struct Compare<const char *,const char *>
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  <  > struct Compare<const char *,const __FlashStringHelper *>
 {
-  inline static int between(const char * const &a,const __FlashStringHelper * const &b)
+  inline static int8_t between(const char * const &a,const __FlashStringHelper * const &b)
   {
-    return strcmp_P(a,(const char *)b);
+    int ans = strcmp_P(a,(const char *)b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const char * const &a,const __FlashStringHelper * const &b)
   {
@@ -333,9 +373,10 @@ template  <  > struct Compare<const char *,const __FlashStringHelper *>
 #endif
 template  <  > struct Compare<const char *,char *>
 {
-  inline static int between(const char * const &a,char * const &b)
+  inline static int8_t between(const char * const &a,char * const &b)
   {
-    return strcmp(a,b);
+    int ans = strcmp(a,b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const char * const &a,char * const &b)
   {
@@ -364,9 +405,10 @@ template  <  > struct Compare<const char *,char *>
 };
 template  < size_t M > struct Compare<const char *,char [M]>
 {
-  inline static int between(const char * const &a,const char (&b)[M])
+  inline static int8_t between(const char * const &a,const char (&b)[M])
   {
-    return strcmp(a,b);
+    int ans = strcmp(a,b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const char * const &a,const char (&b)[M])
   {
@@ -394,9 +436,10 @@ template  < size_t M > struct Compare<const char *,char [M]>
   } // moreOrEqual
 };
 #if ARDUINO_UNIT_USE_FLASH  > 0
+#if defined(ARDUINO)
 template  <  > struct Compare<const __FlashStringHelper *,String>
 {
-  inline static int between(const __FlashStringHelper * const &a,const String &b)
+  inline static int8_t between(const __FlashStringHelper * const &a,const String &b)
   {
     return -Compare < String,const __FlashStringHelper * >::between(b,a);
   } // between
@@ -426,12 +469,14 @@ template  <  > struct Compare<const __FlashStringHelper *,String>
   } // moreOrEqual
 };
 #endif
+#endif
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  <  > struct Compare<const __FlashStringHelper *,const char *>
 {
-  inline static int between(const __FlashStringHelper * const &a,const char * const &b)
+  inline static int8_t between(const __FlashStringHelper * const &a,const char * const &b)
   {
-    return -strcmp_P(b,(const char *)a);
+    int ans = -strcmp_P(b,(const char *)a);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const __FlashStringHelper * const &a,const char * const &b)
   {
@@ -462,7 +507,7 @@ template  <  > struct Compare<const __FlashStringHelper *,const char *>
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  <  > struct Compare<const __FlashStringHelper *,const __FlashStringHelper *>
 {
-  inline static int between(const __FlashStringHelper * const &a,const __FlashStringHelper * const &b)
+  inline static int8_t between(const __FlashStringHelper * const &a,const __FlashStringHelper * const &b)
   {
     return ArduinoUnitString(a).compare(ArduinoUnitString(b));
   } // between
@@ -495,9 +540,10 @@ template  <  > struct Compare<const __FlashStringHelper *,const __FlashStringHel
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  <  > struct Compare<const __FlashStringHelper *,char *>
 {
-  inline static int between(const __FlashStringHelper * const &a,char * const &b)
+  inline static int8_t between(const __FlashStringHelper * const &a,char * const &b)
   {
-    return -strcmp_P(b,(const char *)a);
+    int ans = -strcmp_P(b,(const char *)a);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const __FlashStringHelper * const &a,char * const &b)
   {
@@ -528,9 +574,10 @@ template  <  > struct Compare<const __FlashStringHelper *,char *>
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  < size_t M > struct Compare<const __FlashStringHelper *,char [M]>
 {
-  inline static int between(const __FlashStringHelper * const &a,const char (&b)[M])
+  inline static int8_t between(const __FlashStringHelper * const &a,const char (&b)[M])
   {
-    return -strcmp_P(b,(const char *)a);
+    int ans = -strcmp_P(b,(const char *)a);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const __FlashStringHelper * const &a,const char (&b)[M])
   {
@@ -558,11 +605,13 @@ template  < size_t M > struct Compare<const __FlashStringHelper *,char [M]>
   } // moreOrEqual
 };
 #endif
+#if defined(ARDUINO)
 template  <  > struct Compare<char *,String>
 {
-  inline static int between(char * const &a,const String &b)
+  inline static int8_t between(char * const &a,const String &b)
   {
-    return -b.compareTo(a);
+    int ans = -b.compareTo(a);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(char * const &a,const String &b)
   {
@@ -589,11 +638,13 @@ template  <  > struct Compare<char *,String>
     return between(a,b) >= 0;
   } // moreOrEqual
 };
+#endif
 template  <  > struct Compare<char *,const char *>
 {
-  inline static int between(char * const &a,const char * const &b)
+  inline static int8_t between(char * const &a,const char * const &b)
   {
-    return strcmp(a,b);
+    int ans = strcmp(a,b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(char * const &a,const char * const &b)
   {
@@ -623,9 +674,10 @@ template  <  > struct Compare<char *,const char *>
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  <  > struct Compare<char *,const __FlashStringHelper *>
 {
-  inline static int between(char * const &a,const __FlashStringHelper * const &b)
+  inline static int8_t between(char * const &a,const __FlashStringHelper * const &b)
   {
-    return strcmp_P(a,(const char *)b);
+    int ans = strcmp_P(a,(const char *)b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(char * const &a,const __FlashStringHelper * const &b)
   {
@@ -655,9 +707,10 @@ template  <  > struct Compare<char *,const __FlashStringHelper *>
 #endif
 template  <  > struct Compare<char *,char *>
 {
-  inline static int between(char * const &a,char * const &b)
+  inline static int8_t between(char * const &a,char * const &b)
   {
-    return strcmp(a,b);
+    int ans = strcmp(a,b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(char * const &a,char * const &b)
   {
@@ -686,9 +739,10 @@ template  <  > struct Compare<char *,char *>
 };
 template  < size_t M > struct Compare<char *,char [M]>
 {
-  inline static int between(char * const &a,const char (&b)[M])
+  inline static int8_t between(char * const &a,const char (&b)[M])
   {
-    return strcmp(a,b);
+    int ans = strcmp(a,b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(char * const &a,const char (&b)[M])
   {
@@ -715,11 +769,13 @@ template  < size_t M > struct Compare<char *,char [M]>
     return between(a,b) >= 0;
   } // moreOrEqual
 };
+#if defined(ARDUINO)
 template  < size_t N > struct Compare<char [N],String>
 {
-  inline static int between(const char (&a)[N],const String &b)
+  inline static int8_t between(const char (&a)[N],const String &b)
   {
-    return -b.compareTo(a);
+    int ans = -b.compareTo(a);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const char (&a)[N],const String &b)
   {
@@ -746,11 +802,13 @@ template  < size_t N > struct Compare<char [N],String>
     return between(a,b) >= 0;
   } // moreOrEqual
 };
+#endif
 template  < size_t N > struct Compare<char [N],const char *>
 {
-  inline static int between(const char (&a)[N],const char * const &b)
+  inline static int8_t between(const char (&a)[N],const char * const &b)
   {
-    return strcmp(a,b);
+    int ans = strcmp(a,b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const char (&a)[N],const char * const &b)
   {
@@ -780,9 +838,10 @@ template  < size_t N > struct Compare<char [N],const char *>
 #if ARDUINO_UNIT_USE_FLASH  > 0
 template  < size_t N > struct Compare<char [N],const __FlashStringHelper *>
 {
-  inline static int between(const char (&a)[N],const __FlashStringHelper * const &b)
+  inline static int8_t between(const char (&a)[N],const __FlashStringHelper * const &b)
   {
-    return strcmp_P(a,(const char *)b);
+    int ans = strcmp_P(a,(const char *)b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const char (&a)[N],const __FlashStringHelper * const &b)
   {
@@ -812,9 +871,10 @@ template  < size_t N > struct Compare<char [N],const __FlashStringHelper *>
 #endif
 template  < size_t N > struct Compare<char [N],char *>
 {
-  inline static int between(const char (&a)[N],char * const &b)
+  inline static int8_t between(const char (&a)[N],char * const &b)
   {
-    return strcmp(a,b);
+    int ans = strcmp(a,b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const char (&a)[N],char * const &b)
   {
@@ -843,9 +903,10 @@ template  < size_t N > struct Compare<char [N],char *>
 };
 template  < size_t N, size_t M > struct Compare<char [N],char [M]>
 {
-  inline static int between(const char (&a)[N],const char (&b)[M])
+  inline static int8_t between(const char (&a)[N],const char (&b)[M])
   {
-    return strcmp(a,b);
+    int ans = strcmp(a,b);
+    return ans == 0 ? 0 : (ans > 0) ? 1 : -1;
   } // between
   inline static bool equal(const char (&a)[N],const char (&b)[M])
   {
@@ -872,7 +933,7 @@ template  < size_t N, size_t M > struct Compare<char [N],char [M]>
     return between(a,b) >= 0;
   } // moreOrEqual
 };
-template <typename A, typename B> int compareBetween(const A &a, const B &b) { return Compare<typename ArduinoUnitWiden<A>::type,typename ArduinoUnitWiden<B>::type>::between(a,b); }
+template <typename A, typename B> int8_t compareBetween(const A &a, const B &b) { return Compare<typename ArduinoUnitWiden<A>::type,typename ArduinoUnitWiden<B>::type>::between(a,b); }
 template <typename A, typename B> bool compareEqual(const A &a, const B &b) { return Compare<typename ArduinoUnitWiden<A>::type,typename ArduinoUnitWiden<B>::type>::equal(a,b); }
 template <typename A, typename B> bool compareNotEqual(const A &a, const B &b) { return Compare<typename ArduinoUnitWiden<A>::type,typename ArduinoUnitWiden<B>::type>::notEqual(a,b); }
 template <typename A, typename B> bool compareLess(const A &a, const B &b) { return Compare<typename ArduinoUnitWiden<A>::type,typename ArduinoUnitWiden<B>::type>::less(a,b); }
